@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package sec02;
+
+option java_multiple_files = true;
+option java_package = "com.lokesh.models.sec02";
+
+message Person {
+  string name = 1;
+  int32 age = 2;
+  bool is_active = 3;
+  double salary = 4;
+  int64 data = 5;
+  sint32 neg = 6;
+}

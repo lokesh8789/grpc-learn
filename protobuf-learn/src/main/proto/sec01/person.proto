@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package sec01;
+option java_package = "com.lokesh.models.sec01";
+
+message Person {
+  string name = 1;
+  int32 age = 2;
+}

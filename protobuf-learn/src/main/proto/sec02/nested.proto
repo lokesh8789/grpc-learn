@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package sec02;
+
+option java_multiple_files = true;
+option java_package = "com.lokesh.models.sec02";
+
+import "sec01/person.proto";
+
+import "google/protobuf/wrappers.proto";
+
+//import "google/protobuf/struct.proto";
+//message MyProto {
+//  map<string, google.protobuf.ListValue> my_value = 1;
+//}
+
+enum Status {
+  ACTIVE = 0;
+  INACTIVE = 1;
+}
+
+message Email {
+  string id = 1;
+}
+
+message Phone {
+  string number = 1;
+}
+
+message Student {
+  string name = 1;
+  optional int32 roll = 2;
+  Address address = 3;
+  School school = 4;
+  repeated Student friends = 5;
+  map<string, int32> marks = 6;
+  Status status = 7;
+  sec01.Person person = 8;
+  oneof cred {
+    Email email = 9;
+    Phone phone = 10;
+  };
+  google.protobuf.FloatValue floatVal = 11;
+  reserved 12;
+  reserved "year", "date";
+}
+
+message Address {
+  string city = 1;
+}
+
+message School {
+  string name = 1;
+  Address address = 2;
+}
