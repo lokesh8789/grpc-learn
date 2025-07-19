@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package sec01;
+
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "com.lokesh.sec01";
+
+message BankCheckRequest {
+  int32 account_number = 1;
+}
+
+message AccountBalance {
+  int32 account_number = 1;
+  int32 balance = 2;
+}
+
+message AllAccountResponse {
+  repeated AccountBalance accounts = 1;
+}
+
+message FinalBalance {
+  double balance = 1;
+}
+
+service BankService {
+  rpc GetAccountBalance(BankCheckRequest) returns (AccountBalance);
+  rpc GetAllAccount(google.protobuf.Empty) returns (AllAccountResponse);
+  rpc GetAllAccountStream(google.protobuf.Empty) returns (stream AccountBalance);
+  rpc GetFinalBalance(stream BankCheckRequest) returns (FinalBalance);
+  rpc GetBalanceByEach(stream BankCheckRequest) returns (stream AccountBalance);
+}
