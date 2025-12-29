@@ -6,6 +6,7 @@ import io.grpc.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 public class GrpcServer {
 
@@ -20,7 +21,8 @@ public class GrpcServer {
     }
 
     public static GrpcServer create(int port, BindableService... bindableServices) {
-        var serverBuilder = ServerBuilder.forPort(port);
+        var serverBuilder = ServerBuilder.forPort(port)
+                .executor(Executors.newVirtualThreadPerTaskExecutor());
         Arrays.asList(bindableServices).forEach(serverBuilder::addService);
         return new GrpcServer(serverBuilder.build());
     }
