@@ -37,6 +37,7 @@ public class GrpcClient {
         System.out.println(allAccount);
 
         BankServiceGrpc.BankServiceStub asyncStub = BankServiceGrpc.newStub(managedChannel)
+//                .withCompression("gzip")
                 .withDeadline(Deadline.after(2, TimeUnit.SECONDS));
         ResponseObserver<AccountBalance> observer = ResponseObserver.create();
         asyncStub.getAccountBalance(BankCheckRequest.newBuilder().setAccountNumber(-1).build(), observer);

@@ -5,6 +5,7 @@ import io.grpc.Context;
 import io.grpc.Metadata;
 import io.grpc.Status;
 import io.grpc.protobuf.ProtoUtils;
+import io.grpc.stub.ServerCallStreamObserver;
 import io.grpc.stub.StreamObserver;
 
 import java.util.List;
@@ -27,6 +28,10 @@ public class BankService extends BankServiceGrpc.BankServiceImplBase {
                             .asRuntimeException(metadata)
             );
         }
+
+//        ServerCallStreamObserver<AccountBalance> serverCallStreamObserver = (ServerCallStreamObserver<AccountBalance>) responseObserver;
+//        serverCallStreamObserver.setCompression("gzip");
+
         responseObserver.onNext(AccountBalance.newBuilder()
                 .setBalance(34)
                 .setAccountNumber(request.getAccountNumber())
