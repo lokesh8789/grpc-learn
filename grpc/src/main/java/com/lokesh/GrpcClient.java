@@ -2,13 +2,16 @@ package com.lokesh;
 
 import com.google.protobuf.Empty;
 import com.lokesh.sec01.*;
+import io.grpc.Deadline;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 
+import java.time.Duration;
 import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -18,8 +21,8 @@ public class GrpcClient {
                 .usePlaintext()
                 .build();
 
-        unary(managedChannel);
-//        serverStreaming(managedChannel);
+//        unary(managedChannel);
+        serverStreaming(managedChannel);
 //        clientStreaming(managedChannel);
 //        bidi(managedChannel);
 //        flowControl(managedChannel);
@@ -33,7 +36,8 @@ public class GrpcClient {
         AllAccountResponse allAccount = blockingStub.getAllAccount(Empty.newBuilder().build());
         System.out.println(allAccount);
 
-        BankServiceGrpc.BankServiceStub asyncStub = BankServiceGrpc.newStub(managedChannel);
+        BankServiceGrpc.BankServiceStub asyncStub = BankServiceGrpc.newStub(managedChannel)
+                .withDeadline(Deadline.after(2, TimeUnit.SECONDS));
         ResponseObserver<AccountBalance> observer = ResponseObserver.create();
         asyncStub.getAccountBalance(BankCheckRequest.newBuilder().setAccountNumber(-1).build(), observer);
         observer.await();
@@ -41,9 +45,21 @@ public class GrpcClient {
     }
 
     private static void serverStreaming(ManagedChannel managedChannel) {
-        BankServiceGrpc.BankServiceBlockingStub blockingStub = BankServiceGrpc.newBlockingStub(managedChannel);
-        Iterator<AccountBalance> accountStream = blockingStub.getAllAccountStream(Empty.getDefaultInstance());
-        accountStream.forEachRemaining(System.out::println);
+        try {
+            BankServiceGrpc.BankServiceBlockingStub blockingStub = BankServiceGrpc.newBlockingStub(managedChannel)
+                    .withWaitForReady()
+                    .withDeadline(Deadline.after(2, TimeUnit.SECONDS));
+            Iterator<AccountBalance> accountStream = blockingStub.getAllAccountStream(Empty.getDefaultInstance());
+//            accountStream.forEachRemaining(System.out::println);
+            while (accountStream.hasNext()) {
+                System.out.println(accountStream.next());
+            }
+        } catch (Exception e) {
+            System.out.println("error");
+        }
+        try {
+            Thread.sleep(Duration.ofSeconds(10));
+        } catch (InterruptedException ignored) {}
 
         BankServiceGrpc.BankServiceStub asyncStub = BankServiceGrpc.newStub(managedChannel);
         ResponseObserver<AccountBalance> observer = ResponseObserver.create();

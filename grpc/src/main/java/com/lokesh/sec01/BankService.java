@@ -1,6 +1,7 @@
 package com.lokesh.sec01;
 
 import com.google.protobuf.Empty;
+import io.grpc.Context;
 import io.grpc.Metadata;
 import io.grpc.Status;
 import io.grpc.protobuf.ProtoUtils;
@@ -46,6 +47,16 @@ public class BankService extends BankServiceGrpc.BankServiceImplBase {
     public void getAllAccountStream(Empty request, StreamObserver<AccountBalance> responseObserver) {
         Stream.iterate(0, i -> i + 1)
                 .limit(10)
+                .filter(i -> {
+                    boolean b = Context.current().isCancelled();
+                    System.out.println("Is Cancelled: " + b);
+                    return !b;
+                })
+                .peek(integer -> {
+                    try {
+                        Thread.sleep(500);
+                    } catch (Exception ignored) {}
+                })
                 .map(s -> AccountBalance.newBuilder().setAccountNumber(s).build())
                 .forEach(responseObserver::onNext);
         responseObserver.onCompleted();
