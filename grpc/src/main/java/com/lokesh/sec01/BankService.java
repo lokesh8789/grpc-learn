@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 public class BankService extends BankServiceGrpc.BankServiceImplBase {
     @Override
     public void getAccountBalance(BankCheckRequest request, StreamObserver<AccountBalance> responseObserver) {
-        System.out.println("User Role: " + Constants.USER_ROLE_KEY.get());
+//        System.out.println("User Role: " + Constants.USER_ROLE_KEY.get());
         if (request.getAccountNumber() == 0) {
             responseObserver.onError(Status.INVALID_ARGUMENT.withDescription("Account Number Cannot be Zero").asRuntimeException());
         }

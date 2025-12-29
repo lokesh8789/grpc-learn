@@ -29,7 +29,7 @@ public class GrpcServer {
 //                .intercept(new GzipServerInterceptor())
 //                .intercept(new ApiKeyValidatorInterceptor())
 //                .intercept(new UserTokenInterceptor())
-                .intercept(new UserRoleInterceptor())
+//                .intercept(new UserRoleInterceptor())
                 .executor(Executors.newVirtualThreadPerTaskExecutor());
         Arrays.asList(bindableServices).forEach(serverBuilder::addService);
         return new GrpcServer(serverBuilder.build());
