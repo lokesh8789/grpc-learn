@@ -10,6 +10,7 @@ import io.grpc.stub.StreamObserver;
 import java.time.Duration;
 import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
@@ -62,7 +63,8 @@ public class GrpcClient {
             Thread.sleep(Duration.ofSeconds(10));
         } catch (InterruptedException ignored) {}
 
-        BankServiceGrpc.BankServiceStub asyncStub = BankServiceGrpc.newStub(managedChannel);
+        BankServiceGrpc.BankServiceStub asyncStub = BankServiceGrpc.newStub(managedChannel)
+                .withExecutor(Executors.newVirtualThreadPerTaskExecutor());
         ResponseObserver<AccountBalance> observer = ResponseObserver.create();
         asyncStub.getAllAccountStream(Empty.getDefaultInstance(), observer);
         observer.await();
