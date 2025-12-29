@@ -1,5 +1,6 @@
 package com.lokesh.config;
 
+import com.lokesh.interceptor.GzipServerInterceptor;
 import com.lokesh.sec01.BankService;
 import io.grpc.*;
 
@@ -22,6 +23,7 @@ public class GrpcServer {
 
     public static GrpcServer create(int port, BindableService... bindableServices) {
         var serverBuilder = ServerBuilder.forPort(port)
+                .intercept(new GzipServerInterceptor())
                 .executor(Executors.newVirtualThreadPerTaskExecutor());
         Arrays.asList(bindableServices).forEach(serverBuilder::addService);
         return new GrpcServer(serverBuilder.build());
