@@ -23,7 +23,7 @@ public class GrpcServer {
 
     public static GrpcServer create(int port, BindableService... bindableServices) {
         var serverBuilder = ServerBuilder.forPort(port)
-                .intercept(new GzipServerInterceptor())
+//                .intercept(new GzipServerInterceptor())
                 .executor(Executors.newVirtualThreadPerTaskExecutor());
         Arrays.asList(bindableServices).forEach(serverBuilder::addService);
         return new GrpcServer(serverBuilder.build());
