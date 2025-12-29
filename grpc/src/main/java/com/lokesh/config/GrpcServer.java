@@ -1,6 +1,8 @@
 package com.lokesh.config;
 
+import com.lokesh.interceptor.ApiKeyValidatorInterceptor;
 import com.lokesh.interceptor.GzipServerInterceptor;
+import com.lokesh.interceptor.UserTokenInterceptor;
 import com.lokesh.sec01.BankService;
 import io.grpc.*;
 
@@ -23,7 +25,9 @@ public class GrpcServer {
 
     public static GrpcServer create(int port, BindableService... bindableServices) {
         var serverBuilder = ServerBuilder.forPort(port)
-//                .intercept(new GzipServerInterceptor())
+                .intercept(new GzipServerInterceptor())
+                .intercept(new ApiKeyValidatorInterceptor())
+                .intercept(new UserTokenInterceptor())
                 .executor(Executors.newVirtualThreadPerTaskExecutor());
         Arrays.asList(bindableServices).forEach(serverBuilder::addService);
         return new GrpcServer(serverBuilder.build());

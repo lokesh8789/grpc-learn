@@ -3,26 +3,27 @@ package com.lokesh;
 import com.google.protobuf.Empty;
 import com.lokesh.interceptor.DeadlineInterceptor;
 import com.lokesh.sec01.*;
-import io.grpc.Deadline;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.*;
+import io.grpc.stub.MetadataUtils;
 import io.grpc.stub.StreamObserver;
 
 import java.time.Duration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class GrpcClient {
     public static void main(String[] args) throws InterruptedException {
+        Metadata.Key<String> key = Metadata.Key.of("api-key", Metadata.ASCII_STRING_MARSHALLER);
+        Metadata metadata = new Metadata();
+        metadata.put(key, "lokesh");
+        ClientInterceptor apiKeyInterceptor = MetadataUtils.newAttachHeadersInterceptor(metadata);
+
         ManagedChannel managedChannel = ManagedChannelBuilder.forAddress("localhost", 6565)
                 .usePlaintext()
-//                .intercept(List.of(new DeadlineInterceptor(Duration.ofMillis(2000))))
+                .intercept(new DeadlineInterceptor(Duration.ofMillis(2000)), apiKeyInterceptor)
                 .build();
 
 //        unary(managedChannel);
@@ -41,6 +42,7 @@ public class GrpcClient {
         System.out.println(allAccount);
 
         BankServiceGrpc.BankServiceStub asyncStub = BankServiceGrpc.newStub(managedChannel)
+                .withCallCredentials(new UserSessionToken("user-token-1"))
 //                .withCompression("gzip")
                 .withDeadline(Deadline.after(2, TimeUnit.SECONDS));
         ResponseObserver<AccountBalance> observer = ResponseObserver.create();
@@ -191,5 +193,25 @@ public class GrpcClient {
         private void start() {
             request(1);
         }
+    }
+
+    private static class UserSessionToken extends CallCredentials {
+
+        private static final String TOKEN_FORMAT = "%s %s";
+        private final String jwt;
+
+        public UserSessionToken(String jwt) {
+            this.jwt = jwt;
+        }
+
+        @Override
+        public void applyRequestMetadata(RequestInfo requestInfo, Executor executor, MetadataApplier metadataApplier) {
+            executor.execute(() -> {
+                var metadata = new Metadata();
+                metadata.put(Constants.USER_TOKEN_KEY, TOKEN_FORMAT.formatted(Constants.BEARER, jwt));
+                metadataApplier.apply(metadata);
+            });
+        }
+
     }
 }
