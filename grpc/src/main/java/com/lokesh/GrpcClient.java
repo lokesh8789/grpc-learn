@@ -18,11 +18,11 @@ public class GrpcClient {
                 .usePlaintext()
                 .build();
 
-//        unary(managedChannel);
+        unary(managedChannel);
 //        serverStreaming(managedChannel);
 //        clientStreaming(managedChannel);
 //        bidi(managedChannel);
-        flowControl(managedChannel);
+//        flowControl(managedChannel);
     }
 
     private static void unary(ManagedChannel managedChannel) {
@@ -35,7 +35,7 @@ public class GrpcClient {
 
         BankServiceGrpc.BankServiceStub asyncStub = BankServiceGrpc.newStub(managedChannel);
         ResponseObserver<AccountBalance> observer = ResponseObserver.create();
-        asyncStub.getAccountBalance(BankCheckRequest.newBuilder().setAccountNumber(423443).build(), observer);
+        asyncStub.getAccountBalance(BankCheckRequest.newBuilder().setAccountNumber(-1).build(), observer);
         observer.await();
         System.out.println("Items: " + observer.getItems().size());
     }

@@ -1,10 +1,14 @@
 package com.lokesh;
 
+import io.grpc.Metadata;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -35,6 +39,13 @@ public class ResponseObserver<T> implements StreamObserver<T> {
     @Override
     public void onError(Throwable throwable) {
         System.out.println("onError " + throwable);
+        if (throwable instanceof StatusRuntimeException statusRuntimeException) {
+//            Metadata metadata = Status.trailersFromThrowable(throwable);
+            if (Objects.nonNull(statusRuntimeException.getTrailers())) {
+                Metadata.Key<String> key = Metadata.Key.of("errorCode", Metadata.ASCII_STRING_MARSHALLER);
+                System.out.println("errorCode: " + statusRuntimeException.getTrailers().get(key));
+            }
+        }
         this.throwable = throwable;
         countDownLatch.countDown();
     }

@@ -1,6 +1,9 @@
 package com.lokesh.sec01;
 
 import com.google.protobuf.Empty;
+import io.grpc.Metadata;
+import io.grpc.Status;
+import io.grpc.protobuf.ProtoUtils;
 import io.grpc.stub.StreamObserver;
 
 import java.util.List;
@@ -9,6 +12,20 @@ import java.util.stream.Stream;
 public class BankService extends BankServiceGrpc.BankServiceImplBase {
     @Override
     public void getAccountBalance(BankCheckRequest request, StreamObserver<AccountBalance> responseObserver) {
+        if (request.getAccountNumber() == 0) {
+            responseObserver.onError(Status.INVALID_ARGUMENT.withDescription("Account Number Cannot be Zero").asRuntimeException());
+        }
+        if (request.getAccountNumber() < 0) {
+//            Metadata.Key<FinalBalance> finalBalanceKey = ProtoUtils.keyForProto(FinalBalance.getDefaultInstance()); // Make Key Out of Any Proto, i.e. with ErrorMessage Proto like of FinalBalance one.
+            Metadata.Key<String> key = Metadata.Key.of("errorCode", Metadata.ASCII_STRING_MARSHALLER);
+            Metadata metadata = new Metadata();
+            metadata.put(key, "LESS_THAN_ZERO");
+            responseObserver.onError(
+                    Status.INVALID_ARGUMENT
+                            .withDescription("Account Number Cannot be less than Zero")
+                            .asRuntimeException(metadata)
+            );
+        }
         responseObserver.onNext(AccountBalance.newBuilder()
                 .setBalance(34)
                 .setAccountNumber(request.getAccountNumber())
@@ -61,7 +78,7 @@ public class BankService extends BankServiceGrpc.BankServiceImplBase {
             @Override
             public void onNext(BankCheckRequest bankCheckRequest) {
                 System.out.println("Received Request: " + bankCheckRequest);
-                responseObserver.onNext(AccountBalance.newBuilder().setAccountNumber(bankCheckRequest.getAccountNumber()).build());
+                responseObserver.onNext(AccountBalance.newBuilder().setAccountNumber(bankCheckRequest.getAccountNumber() * 2).build());
             }
 
             @Override
