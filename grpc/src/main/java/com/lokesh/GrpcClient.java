@@ -22,7 +22,7 @@ public class GrpcClient {
     public static void main(String[] args) throws InterruptedException {
         ManagedChannel managedChannel = ManagedChannelBuilder.forAddress("localhost", 6565)
                 .usePlaintext()
-                .intercept(List.of(new DeadlineInterceptor(Duration.ofMillis(2000))))
+//                .intercept(List.of(new DeadlineInterceptor(Duration.ofMillis(2000))))
                 .build();
 
 //        unary(managedChannel);
