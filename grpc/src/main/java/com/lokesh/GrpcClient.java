@@ -16,14 +16,14 @@ import java.util.stream.Stream;
 
 public class GrpcClient {
     public static void main(String[] args) throws InterruptedException {
-        Metadata.Key<String> key = Metadata.Key.of("api-key", Metadata.ASCII_STRING_MARSHALLER);
-        Metadata metadata = new Metadata();
-        metadata.put(key, "lokesh");
-        ClientInterceptor apiKeyInterceptor = MetadataUtils.newAttachHeadersInterceptor(metadata);
+//        Metadata.Key<String> key = Metadata.Key.of("api-key", Metadata.ASCII_STRING_MARSHALLER);
+//        Metadata metadata = new Metadata();
+//        metadata.put(key, "lokesh");
+//        ClientInterceptor apiKeyInterceptor = MetadataUtils.newAttachHeadersInterceptor(metadata);
 
         ManagedChannel managedChannel = ManagedChannelBuilder.forAddress("localhost", 6565)
                 .usePlaintext()
-                .intercept(new DeadlineInterceptor(Duration.ofMillis(2000)), apiKeyInterceptor)
+//                .intercept(new DeadlineInterceptor(Duration.ofMillis(2000)), apiKeyInterceptor)
                 .build();
 
 //        unary(managedChannel);
@@ -42,7 +42,7 @@ public class GrpcClient {
         System.out.println(allAccount);
 
         BankServiceGrpc.BankServiceStub asyncStub = BankServiceGrpc.newStub(managedChannel)
-                .withCallCredentials(new UserSessionToken("user-token-1"))
+//                .withCallCredentials(new UserSessionToken("user-token-1"))
 //                .withCompression("gzip")
                 .withDeadline(Deadline.after(2, TimeUnit.SECONDS));
         ResponseObserver<AccountBalance> observer = ResponseObserver.create();
