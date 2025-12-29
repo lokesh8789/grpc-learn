@@ -1,6 +1,7 @@
 package com.lokesh.sec01;
 
 import com.google.protobuf.Empty;
+import com.lokesh.Constants;
 import io.grpc.Context;
 import io.grpc.Metadata;
 import io.grpc.Status;
@@ -14,6 +15,7 @@ import java.util.stream.Stream;
 public class BankService extends BankServiceGrpc.BankServiceImplBase {
     @Override
     public void getAccountBalance(BankCheckRequest request, StreamObserver<AccountBalance> responseObserver) {
+        System.out.println("User Role: " + Constants.USER_ROLE_KEY.get());
         if (request.getAccountNumber() == 0) {
             responseObserver.onError(Status.INVALID_ARGUMENT.withDescription("Account Number Cannot be Zero").asRuntimeException());
         }

@@ -26,27 +26,27 @@ public class GrpcClient {
 //                .intercept(new DeadlineInterceptor(Duration.ofMillis(2000)), apiKeyInterceptor)
                 .build();
 
-//        unary(managedChannel);
-        serverStreaming(managedChannel);
+        unary(managedChannel);
+//        serverStreaming(managedChannel);
 //        clientStreaming(managedChannel);
 //        bidi(managedChannel);
 //        flowControl(managedChannel);
     }
 
     private static void unary(ManagedChannel managedChannel) {
-        BankServiceGrpc.BankServiceBlockingStub blockingStub = BankServiceGrpc.newBlockingStub(managedChannel);
-        AccountBalance accountBalance = blockingStub.getAccountBalance(BankCheckRequest.newBuilder().setAccountNumber(13214).build());
-        System.out.println(accountBalance);
-
-        AllAccountResponse allAccount = blockingStub.getAllAccount(Empty.newBuilder().build());
-        System.out.println(allAccount);
+//        BankServiceGrpc.BankServiceBlockingStub blockingStub = BankServiceGrpc.newBlockingStub(managedChannel);
+//        AccountBalance accountBalance = blockingStub.getAccountBalance(BankCheckRequest.newBuilder().setAccountNumber(13214).build());
+//        System.out.println(accountBalance);
+//
+//        AllAccountResponse allAccount = blockingStub.getAllAccount(Empty.newBuilder().build());
+//        System.out.println(allAccount);
 
         BankServiceGrpc.BankServiceStub asyncStub = BankServiceGrpc.newStub(managedChannel)
-//                .withCallCredentials(new UserSessionToken("user-token-1"))
+                .withCallCredentials(new UserSessionToken("user-token-3"))
 //                .withCompression("gzip")
                 .withDeadline(Deadline.after(2, TimeUnit.SECONDS));
         ResponseObserver<AccountBalance> observer = ResponseObserver.create();
-        asyncStub.getAccountBalance(BankCheckRequest.newBuilder().setAccountNumber(-1).build(), observer);
+        asyncStub.getAccountBalance(BankCheckRequest.newBuilder().setAccountNumber(1).build(), observer);
         observer.await();
         System.out.println("Items: " + observer.getItems().size());
     }
