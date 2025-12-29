@@ -1,6 +1,7 @@
 package com.lokesh;
 
 import com.google.protobuf.Empty;
+import com.lokesh.interceptor.DeadlineInterceptor;
 import com.lokesh.sec01.*;
 import io.grpc.Deadline;
 import io.grpc.ManagedChannel;
@@ -9,6 +10,7 @@ import io.grpc.stub.StreamObserver;
 
 import java.time.Duration;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
@@ -20,6 +22,7 @@ public class GrpcClient {
     public static void main(String[] args) throws InterruptedException {
         ManagedChannel managedChannel = ManagedChannelBuilder.forAddress("localhost", 6565)
                 .usePlaintext()
+                .intercept(List.of(new DeadlineInterceptor(Duration.ofMillis(2000))))
                 .build();
 
 //        unary(managedChannel);
