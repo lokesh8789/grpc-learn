@@ -1,5 +1,6 @@
 package com.grpc.spring;
 
+import net.devh.boot.grpc.client.channelfactory.GrpcChannelConfigurer;
 import net.devh.boot.grpc.server.serverfactory.GrpcServerConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,5 +12,10 @@ public class GrpcConfig {
     @Bean
     public GrpcServerConfigurer serverConfigurer() {
         return serverBuilder -> serverBuilder.executor(Executors.newVirtualThreadPerTaskExecutor());
+    }
+
+    @Bean
+    public GrpcChannelConfigurer channelConfigurer() {
+        return (managedChannelBuilder, s) -> managedChannelBuilder.executor(Executors.newVirtualThreadPerTaskExecutor());
     }
 }
