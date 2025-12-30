@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package proto;
+
+option java_multiple_files = true;
+option java_package = "com.grpc.spring.proto";
+
+message HelloRequest {
+  string name = 1;
+}
+
+message HelloResponse {
+  string data = 1;
+}
+
+service HelloService {
+  rpc GetHelloData(HelloRequest) returns (HelloResponse);
+  rpc GetHelloStream(HelloRequest) returns (stream HelloResponse);
+  rpc GetHelloClientStream(stream HelloRequest) returns (HelloResponse);
+  rpc GetHelloBidiStream(stream HelloRequest) returns (stream HelloResponse);
+}
