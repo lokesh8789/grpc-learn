@@ -1,8 +1,6 @@
 package com.grpc.spring;
 
-import com.grpc.spring.proto.HelloRequest;
-import com.grpc.spring.proto.HelloResponse;
-import com.grpc.spring.proto.HelloServiceGrpc;
+import com.grpc.spring.proto.*;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -18,8 +16,12 @@ public class DemoClientService implements CommandLineRunner {
     @GrpcClient("another-service")
     HelloServiceGrpc.HelloServiceStub helloServiceStub;
 
+    @GrpcClient("another-service")
+    UserServiceGrpc.UserServiceStub userServiceStub;
+
     public void getHelloData() {
-        helloServiceStub.withWaitForReady()
+        helloServiceStub
+                .withWaitForReady()
                 .getHelloData(HelloRequest.newBuilder().setName("lok").build(), new StreamObserver<HelloResponse>() {
             @Override
             public void onNext(HelloResponse helloResponse) {
@@ -117,6 +119,24 @@ public class DemoClientService implements CommandLineRunner {
         requestStreamObserver.onCompleted();
     }
 
+    public void getUserDetails() {
+        userServiceStub
+                .getUserDetails(User.newBuilder().setName("Lokesh").build(), new StreamObserver<>() {
+            @Override
+            public void onNext(UserResponse userResponse) {
+                log.info("User Response: {}", userResponse);
+            }
+
+            @Override
+            public void onError(Throwable throwable) {}
+
+            @Override
+            public void onCompleted() {
+                log.info("User Response Completed");
+            }
+        });
+    }
+
     public void handleException(Callable<?> callable) {
         try {
             callable.call();
@@ -128,6 +148,7 @@ public class DemoClientService implements CommandLineRunner {
 //        getHelloData();
 //        getHelloStream();
 //        getHelloClientStream();
-        getHelloBidiStream();
+//        getHelloBidiStream();
+        getUserDetails();
     }
 }
